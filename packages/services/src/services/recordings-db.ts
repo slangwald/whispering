@@ -2,6 +2,7 @@ import type { Effect } from 'effect';
 import { Context, Data } from 'effect';
 
 type TranscriptionStatus = 'UNPROCESSED' | 'TRANSCRIBING' | 'DONE';
+type PostProcessingStatus = 'UNPROCESSED' | 'PROCESSING' | 'DONE';
 
 export type Recording = {
 	id: string;
@@ -9,6 +10,7 @@ export type Recording = {
 	subtitle: string;
 	timestamp: string;
 	transcribedText: string;
+	processedText: string;
 	blob: Blob;
 	/**
 	 * A recording
@@ -17,6 +19,7 @@ export type Recording = {
 	 * 3. Finally is marked as 'DONE' when the transcription is complete.
 	 */
 	transcriptionStatus: TranscriptionStatus;
+	postProcessingStatus: PostProcessingStatus;
 };
 
 export class RecordingDbError extends Data.TaggedError('RecordingDbError')<{

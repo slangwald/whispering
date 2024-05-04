@@ -80,14 +80,19 @@ export const createRecorder = () =>
 							timestamp: new Date().toISOString(),
 							transcribedText: '',
 							blob: audioBlob,
-							transcriptionStatus: 'UNPROCESSED'
+							transcriptionStatus: 'UNPROCESSED',
+							processedText: '',
+							postProcessingStatus: 'UNPROCESSED'
 						};
 						recorderState.set('IDLE');
 						yield* _(recordings.addRecording(newRecording));
 						const transcribeAndCopyPromise = Effect.gen(function* (_) {
 							const clipboardService = yield* _(ClipboardService);
-							const transcription = yield* _(recordings.transcribeRecording(newRecording.id));
+							let transcription = yield* _(recordings.transcribeRecording(newRecording.id));
 							const $settings = get(settings);
+							if ($settings.isPostProcessingEnabled) {
+								transcription = yield* _(recordings.postProcessRecording(newRecording.id));
+							}
 							if ($settings.isCopyToClipboardEnabled && transcription)
 								yield* _(clipboardService.setClipboardText(transcription));
 							if ($settings.isPasteContentsOnSuccessEnabled && transcription)

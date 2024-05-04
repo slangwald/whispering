@@ -45,6 +45,16 @@
 			</div>
 			<div class="flex items-center gap-2">
 				<Switch
+					id="post-processing"
+					aria-labelledby="post-processing"
+					bind:checked={$settings.isPostProcessingEnabled}
+				/>
+				<Label for="post-processing">
+					Post process transcriptions automatically before copy to clipboard
+				</Label>
+			</div>
+			<div class="flex items-center gap-2">
+				<Switch
 					id="paste-from-clipboard"
 					aria-labelledby="paste-from-clipboard"
 					bind:checked={$settings.isPasteContentsOnSuccessEnabled}
@@ -54,6 +64,7 @@
 					<span class="text-muted-foreground">(experimental)</span>
 				</Label>
 			</div>
+
 			<div class="grid gap-2">
 				<Label class="text-sm" for="recording-device">Recording Device</Label>
 				{#await getMediaDevicesPromise}

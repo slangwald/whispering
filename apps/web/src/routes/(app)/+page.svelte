@@ -119,10 +119,12 @@
 				>
 					space
 				</kbd>
-			</Button> to start recording.
+			</Button>
+			to start recording.
 		</p>
 		<p class="text-muted-foreground text-sm font-light">
-			Check out the <Button
+			Check out the
+			<Button
 				href="https://chrome.google.com/webstore/detail/whispering/oilbfihknpdbpfkcncojikmooipnlglo?hl=en&authuser=0"
 				variant="link"
 				class="h-fit px-0.5 py-0"
@@ -132,7 +134,9 @@
 				aria-label="Check out the Chrome Extension"
 			>
 				extension
-			</Button> and <Button
+			</Button>
+			and
+			<Button
 				href="https://github.com/braden-w/whispering/releases"
 				variant="link"
 				class="h-fit px-0.5 py-0"
@@ -142,7 +146,8 @@
 				aria-label="Check out the desktop app"
 			>
 				app
-			</Button> for shortcuts.
+			</Button>
+			for shortcuts.
 		</p>
 	</div>
 </div>

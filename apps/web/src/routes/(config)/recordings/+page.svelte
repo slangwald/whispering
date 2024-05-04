@@ -25,6 +25,7 @@
 	import RenderAudioUrl from './RenderAudioUrl.svelte';
 	import RowActions from './RowActions.svelte';
 	import TranscribedText from './TranscribedText.svelte';
+	import ProcessedText from './ProcessedText.svelte';
 
 	const table = createTable(recordings, {
 		hide: addHiddenColumns(),
@@ -64,14 +65,7 @@
 				sort: { disable: true }
 			}
 		}),
-		table.column({
-			accessor: 'title',
-			header: 'Title'
-		}),
-		table.column({
-			accessor: 'subtitle',
-			header: 'Subtitle'
-		}),
+
 		table.column({
 			accessor: 'timestamp',
 			header: 'Timestamp'
@@ -99,6 +93,25 @@
 				sort: {
 					getSortValue: ({ transcribedText }) => {
 						return transcribedText;
+					}
+				}
+			}
+		}),
+		table.column({
+			accessor: ({ id, processedText }) => ({ id, processedText }),
+			header: 'Processed Text',
+			cell: ({ value: { id, processedText } }) => {
+				return createRender(ProcessedText, { recordingId: id, processedText });
+			},
+			plugins: {
+				filter: {
+					getFilterValue: ({ processedText }) => {
+						return processedText;
+					}
+				},
+				sort: {
+					getSortValue: ({ processedText }) => {
+						return processedText;
 					}
 				}
 			}
@@ -196,7 +209,8 @@
 			<DropdownMenu.Root>
 				<DropdownMenu.Trigger asChild let:builder>
 					<Button variant="outline" class="ml-auto" builders={[builder]}>
-						Columns <ChevronDown class="ml-2 h-4 w-4" />
+						Columns
+						<ChevronDown class="ml-2 h-4 w-4" />
 					</Button>
 				</DropdownMenu.Trigger>
 				<DropdownMenu.Content>
@@ -217,7 +231,9 @@
 								<Subscribe attrs={cell.attrs()} let:attrs props={cell.props()} let:props>
 									<Table.Head {...attrs} class="[&:has([role=checkbox])]:pl-3">
 										{#if props.sort.disabled && cell.id === 'id'}
-											<div class="px-1"><Render of={cell.render()} /></div>
+											<div class="px-1">
+												<Render of={cell.render()} />
+											</div>
 										{:else}
 											<Button
 												variant="ghost"
@@ -254,7 +270,7 @@
 											<Render of={cell.render()} />
 										</Table.Cell>
 									{:else}
-										<Table.Cell {...attrs} class="text-center">
+										<Table.Cell {...attrs} class="text-left">
 											<Render of={cell.render()} />
 										</Table.Cell>
 									{/if}

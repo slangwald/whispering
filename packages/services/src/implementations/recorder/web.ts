@@ -4,6 +4,7 @@ import { RecorderError, RecorderService } from '../../services/recorder';
 
 class GetNavigatorMediaError extends RecorderError {
 	constructor({ message, origError }: { message: string; origError?: unknown }) {
+		console.log(origError);
 		super({ message, origError });
 	}
 }
@@ -85,9 +86,9 @@ export const RecorderServiceLiveWeb = Layer.succeed(
 		),
 		enumerateRecordingDevices: Effect.tryPromise({
 			try: async () => {
+				await navigator.mediaDevices.getUserMedia({ audio: true, video: false });
 				const devices = await navigator.mediaDevices.enumerateDevices();
-				const audioInputDevices = devices.filter((device) => device.kind === 'audioinput');
-				return audioInputDevices;
+				return devices.filter((device) => device.kind === 'audioinput');
 			},
 			catch: (error) =>
 				new EnumerateRecordingDevicesError({

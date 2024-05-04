@@ -5,6 +5,7 @@ import { Effect } from 'effect';
 import { toast } from 'svelte-sonner';
 import { get, writable } from 'svelte/store';
 import { settings } from '../settings';
+import { PostProcessingService } from '@repo/services/services/post-processing';
 
 class TranscriptionRecordingNotFoundError extends TranscriptionError {
 	constructor({ message }: { message: string }) {
@@ -15,6 +16,7 @@ class TranscriptionRecordingNotFoundError extends TranscriptionError {
 export const createRecordings = Effect.gen(function* (_) {
 	const recordingsDb = yield* _(RecordingsDbService);
 	const transcriptionService = yield* _(TranscriptionService);
+	const postProcessingService = yield* _(PostProcessingService);
 	const clipboardService = yield* _(ClipboardService);
 	const { subscribe, set, update } = writable<Recording[]>([]);
 	const setRecording = (recording: Recording) =>
@@ -90,10 +92,35 @@ export const createRecordings = Effect.gen(function* (_) {
 				yield* _(setRecording({ ...recording, transcribedText, transcriptionStatus: 'DONE' }));
 				return transcribedText;
 			}),
+		postProcessRecording: (id: string) =>
+			Effect.gen(function* (_) {
+				const recording = yield* _(recordingsDb.getRecording(id));
+				if (!recording) {
+					return yield* _(
+						new TranscriptionRecordingNotFoundError({
+							message: `Recording with id ${id} not found`
+						})
+					);
+				}
+				yield* _(setRecording({ ...recording, postProcessingStatus: 'PROCESSING' }));
+				const processedText = yield* _(
+					postProcessingService.postprocess(
+						recording.transcribedText,
+						'TODO: PROMPT HERE',
+						get(settings)
+					)
+				);
+				yield* _(setRecording({ ...recording, processedText, postProcessingStatus: 'DONE' }));
+				return processedText;
+			}),
 		copyRecordingText: (recording: Recording) =>
 			Effect.gen(function* (_) {
 				if (!recording.transcribedText) return;
-				yield* _(clipboardService.setClipboardText(recording.transcribedText));
+				let text = recording.transcribedText;
+				if (recording.processedText) {
+					text = recording.processedText;
+				}
+				yield* _(clipboardService.setClipboardText(text));
 				toast.success('Copied to clipboard!');
 			})
 	};
